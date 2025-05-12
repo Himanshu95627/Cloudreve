@@ -1,12 +1,6 @@
 package middleware
 
 import (
-	"fmt"
-	"github.com/cloudreve/Cloudreve/v4/application/dependency"
-	"github.com/cloudreve/Cloudreve/v4/pkg/filemanager/fs/dbfs"
-	"github.com/cloudreve/Cloudreve/v4/pkg/serializer"
-	"github.com/cloudreve/Cloudreve/v4/pkg/util"
-	"github.com/cloudreve/Cloudreve/v4/routers/controllers"
 	"github.com/gin-gonic/gin"
 	"github.com/gofrs/uuid"
 )
@@ -29,6 +23,11 @@ func ValidateBatchFileCount(dep dependency.Dep, ctxKey interface{}) gin.HandlerF
 				fmt.Sprintf("Maximum allowed batch size: %d", limit),
 				nil,
 			))
+			c.Abort()
+			return
+		}
+		if err != nil {
+			c.JSON(200, serializer.ErrWithDetails(c, serializer.CodeCredentialInvalid, err.Error(), err))
 			c.Abort()
 			return
 		}
