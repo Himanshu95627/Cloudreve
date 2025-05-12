@@ -3,16 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/cloudreve/Cloudreve/v4/application/dependency"
-	"github.com/cloudreve/Cloudreve/v4/ent"
-	"github.com/cloudreve/Cloudreve/v4/inventory"
-	"github.com/cloudreve/Cloudreve/v4/inventory/types"
-	"github.com/cloudreve/Cloudreve/v4/pkg/filemanager/driver/oss"
-	"github.com/cloudreve/Cloudreve/v4/pkg/filemanager/fs"
-	"github.com/cloudreve/Cloudreve/v4/pkg/filemanager/manager"
-	"github.com/cloudreve/Cloudreve/v4/pkg/logging"
-	"github.com/cloudreve/Cloudreve/v4/pkg/request"
-	"github.com/cloudreve/Cloudreve/v4/pkg/util"
+
 
 	"github.com/cloudreve/Cloudreve/v4/pkg/auth"
 	"github.com/cloudreve/Cloudreve/v4/pkg/serializer"
@@ -32,6 +23,24 @@ func SignRequired(authInstance auth.Auth) gin.HandlerFunc {
 			err = auth.CheckRequest(c, authInstance, c.Request)
 		default:
 			err = auth.CheckURI(c, authInstance, c.Request.URL)
+		}
+		
+		if err != nil {
+			c.JSON(200, serializer.ErrWithDetails(c, serializer.CodeCredentialInvalid, err.Error(), err))
+			c.Abort()
+			return
+		}
+
+		if err != nil {
+			c.JSON(200, serializer.ErrWithDetails(c, serializer.CodeCredentialInvalid, err.Error(), err))
+			c.Abort()
+			return
+		}
+
+		if err != nil {
+			c.JSON(200, serializer.ErrWithDetails(c, serializer.CodeCredentialInvalid, err.Error(), err))
+			c.Abort()
+			return
 		}
 
 		if err != nil {
@@ -116,6 +125,11 @@ func WebDAVAuth() gin.HandlerFunc {
 			return
 		}
 
+		if err != nil {
+			c.JSON(200, serializer.ErrWithDetails(c, serializer.CodeCredentialInvalid, err.Error(), err))
+			c.Abort()
+			return
+		}
 		dep := dependency.FromContext(c)
 		l := dep.Logger()
 		userClient := dep.UserClient()
@@ -167,6 +181,13 @@ func WebDAVAuth() gin.HandlerFunc {
 				c.Abort()
 				return
 			}
+		}
+
+
+		if err != nil {
+			c.JSON(200, serializer.ErrWithDetails(c, serializer.CodeCredentialInvalid, err.Error(), err))
+			c.Abort()
+			return
 		}
 
 		SetUserCtxByUser(c, expectedUser)
